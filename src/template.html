@@ -300,6 +300,34 @@
             border-top: 1px solid #edf2f7;
         }
 
+        /* PDF Export Button */
+        .pdf-export-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s, box-shadow 0.2s;
+            z-index: 1000;
+            font-family: inherit;
+        }
+
+        .pdf-export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .pdf-export-btn:active {
+            transform: translateY(0);
+        }
+
         /* Print Styles */
         @media print {
             body {
@@ -324,6 +352,10 @@
 
             .metric-card {
                 break-inside: avoid;
+            }
+
+            .pdf-export-btn {
+                display: none !important;
             }
         }
 
@@ -519,5 +551,7 @@
             由 Earnings-Decoded 自动生成 · 数据来源于公开财报及新闻 · 仅供参考，不构成投资建议
         </div>
     </div>
+
+    <button class="pdf-export-btn" onclick="window.print()">📄 导出 PDF</button>
 </body>
 </html>

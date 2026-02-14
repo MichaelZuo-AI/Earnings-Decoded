@@ -1,11 +1,19 @@
 {
   "name": "earnings-decoded",
   "version": "1.0.0",
-  "description": "Translate corporate earnings financial reports into human-readable Chinese analysis via Claude Code",
+  "description": "Company business analysis and earnings interpretation in Chinese via Claude Code",
   "private": true,
   "scripts": {
-    "open-latest": "open reports/$(ls -t reports/ | head -1)"
+    "open-latest": "open reports/$(ls -t reports/ | head -1)",
+    "pdf": "node src/generate-pdf.js"
   },
-  "keywords": ["earnings", "financial-analysis", "claude-code"],
-  "license": "MIT"
+  "keywords": [
+    "earnings",
+    "financial-analysis",
+    "claude-code"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "puppeteer-core": "^24.37.3"
+  }
 }

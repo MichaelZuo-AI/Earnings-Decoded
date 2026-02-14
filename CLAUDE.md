@@ -106,7 +106,8 @@ Read the template from `src/template.html` and use it as a reference for styling
 1. Write the HTML file to: `reports/[TICKER]-[YYYY]-[Quarter].html`
    - Example: `reports/AAPL-2025-Q1.html`
    - If ticker is unknown, use the company name: `reports/Coupang-2025-Q1.html`
-2. Open in Chrome: `open reports/[filename].html`
+2. Generate PDF: `node src/generate-pdf.js reports/[filename].html`
+3. Open HTML in Chrome: `open reports/[filename].html`
 
 ---
 
@@ -177,7 +178,8 @@ Read the template from `src/template.html` and use it as a reference for styling
 1. Write the HTML file to: `reports/[TICKER]-[YYYY]-[Quarter]-preview.html`
    - Example: `reports/AAPL-2025-Q2-preview.html`
    - If ticker is unknown, use the company name: `reports/Coupang-2025-Q2-preview.html`
-2. Open in Chrome: `open reports/[filename].html`
+2. Generate PDF: `node src/generate-pdf.js reports/[filename].html`
+3. Open HTML in Chrome: `open reports/[filename].html`
 
 ---
 
@@ -291,7 +293,8 @@ Read the template from `src/template-analysis.html` and use it as a reference fo
    - Example: `reports/BABA-analysis-2026-02.html`
    - If ticker is unknown, use the company name: `reports/Coupang-analysis-2026-02.html`
    - Uses year-month (not quarter) since this analysis is not tied to a specific earnings period
-2. Open in Chrome: `open reports/[filename].html`
+2. Generate PDF: `node src/generate-pdf.js reports/[filename].html`
+3. Open HTML in Chrome: `open reports/[filename].html`
 
 ---
 
@@ -334,7 +337,8 @@ Templates are in `src/`. Key styling rules shared across all templates:
 - Light background (#f8f9fa), max-width 900px, centered
 - System font stack for clean reading
 - Tables: alternating row colors, clean borders
-- Print-friendly: `@media print` styles included
+- Print-friendly: `@media print` styles included (PDF export button auto-hidden)
+- Floating "📄 导出 PDF" button (bottom-right corner, hidden in print/PDF)
 - Responsive: works on desktop and mobile
 
 | Template | File | Header | Accent |

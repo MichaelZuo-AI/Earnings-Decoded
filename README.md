@@ -15,17 +15,21 @@ Company business analysis and earnings interpretation in Chinese — powered ent
 1. Open Claude Code in this directory
 2. Type a command (see table above)
 3. Claude searches for data, analyzes it, and generates a styled HTML report
-4. Report auto-opens in your browser
+4. A PDF copy is auto-generated for sharing
+5. Report auto-opens in your browser
 
 ## Output
 
-Reports are saved to `reports/` as self-contained HTML files:
+Reports are saved to `reports/` as self-contained HTML + PDF files:
 
 ```
 reports/AAPL-2025-Q1.html              # 财报解读
+reports/AAPL-2025-Q1.pdf               # PDF for sharing
 reports/AAPL-2025-Q2-preview.html      # 财报前瞻
 reports/BABA-analysis-2026-02.html     # 企业经营分析
 ```
+
+Each HTML report also has a floating "导出 PDF" button for manual export via the browser print dialog.
 
 ## Report Sections
 
@@ -68,6 +72,8 @@ reports/BABA-analysis-2026-02.html     # 企业经营分析
 
 - [Claude Code](https://claude.ai/code) CLI with active subscription
 - macOS (uses `open` to launch browser)
+- Google Chrome (for PDF generation)
+- `npm install` (one-time setup for puppeteer-core)
 
 ## Zero API Cost
 
