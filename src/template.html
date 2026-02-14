@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{COMPANY_NAME}} — {{PERIOD}} 财报解读</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: #f8f9fa;
+            color: #1a1a2e;
+            line-height: 1.7;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+        }
+
+        /* Header */
+        .report-header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            padding: 2.5rem 2.5rem 2rem;
+        }
+
+        .report-header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+
+        .report-header .subtitle {
+            font-size: 1rem;
+            color: #a0aec0;
+            margin-bottom: 1rem;
+        }
+
+        .header-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            font-size: 0.85rem;
+            color: #cbd5e0;
+        }
+
+        .header-meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        /* Section */
+        .section {
+            padding: 2rem 2.5rem;
+            border-bottom: 1px solid #edf2f7;
+        }
+
+        .section:last-child {
+            border-bottom: none;
+        }
+
+        .section h2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 1.2rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        /* Metric Cards Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .metric-card {
+            background: #fafbfc;
+            border-radius: 8px;
+            padding: 1.2rem 1rem 1.2rem 1.2rem;
+            border-left: 4px solid #cbd5e0;
+            transition: box-shadow 0.2s;
+        }
+
+        .metric-card:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .metric-card.beat {
+            border-left-color: #38a169;
+        }
+
+        .metric-card.miss {
+            border-left-color: #e53e3e;
+        }
+
+        .metric-card.neutral {
+            border-left-color: #a0aec0;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            color: #718096;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.3rem;
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+
+        .metric-detail {
+            font-size: 0.82rem;
+            color: #718096;
+            margin-top: 0.3rem;
+        }
+
+        .metric-detail .positive {
+            color: #38a169;
+            font-weight: 600;
+        }
+
+        .metric-detail .negative {
+            color: #e53e3e;
+            font-weight: 600;
+        }
+
+        .metric-badge {
+            display: inline-block;
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            margin-top: 0.4rem;
+        }
+
+        .metric-badge.beat {
+            background: #f0fff4;
+            color: #276749;
+        }
+
+        .metric-badge.miss {
+            background: #fff5f5;
+            color: #9b2c2c;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        thead th {
+            background: #f7fafc;
+            color: #4a5568;
+            font-weight: 600;
+            text-align: left;
+            padding: 0.75rem 1rem;
+            border-bottom: 2px solid #e2e8f0;
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        tbody td {
+            padding: 0.7rem 1rem;
+            border-bottom: 1px solid #edf2f7;
+            color: #2d3748;
+        }
+
+        tbody tr:nth-child(even) {
+            background: #fafbfc;
+        }
+
+        tbody tr:hover {
+            background: #f0f4f8;
+        }
+
+        td.positive {
+            color: #38a169;
+            font-weight: 600;
+        }
+
+        td.negative {
+            color: #e53e3e;
+            font-weight: 600;
+        }
+
+        /* Highlights List */
+        .highlights-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .highlights-list li {
+            padding: 0.7rem 0;
+            border-bottom: 1px solid #f0f4f8;
+            font-size: 0.92rem;
+            line-height: 1.6;
+        }
+
+        .highlights-list li:last-child {
+            border-bottom: none;
+        }
+
+        /* Assessment Badge */
+        .assessment {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            padding: 0.5rem 1.2rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .assessment.positive {
+            background: #f0fff4;
+            color: #276749;
+        }
+
+        .assessment.neutral {
+            background: #fefcbf;
+            color: #975a16;
+        }
+
+        .assessment.negative {
+            background: #fff5f5;
+            color: #9b2c2c;
+        }
+
+        .summary-text {
+            font-size: 0.95rem;
+            line-height: 1.8;
+            color: #2d3748;
+        }
+
+        .summary-text p {
+            margin-bottom: 1rem;
+        }
+
+        /* Risk items */
+        .risk-item {
+            background: #fffaf0;
+            border-left: 3px solid #ed8936;
+            padding: 0.8rem 1rem;
+            margin-bottom: 0.6rem;
+            border-radius: 0 6px 6px 0;
+            font-size: 0.9rem;
+        }
+
+        /* Guidance comparison */
+        .guidance-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid #edf2f7;
+        }
+
+        .guidance-row:last-child {
+            border-bottom: none;
+        }
+
+        .guidance-label {
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .guidance-value {
+            font-weight: 700;
+            font-size: 1.05rem;
+        }
+
+        /* Footer */
+        .report-footer {
+            text-align: center;
+            padding: 1.5rem 2.5rem;
+            font-size: 0.78rem;
+            color: #a0aec0;
+            border-top: 1px solid #edf2f7;
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                background: #fff;
+                padding: 0;
+            }
+
+            .container {
+                box-shadow: none;
+                border-radius: 0;
+            }
+
+            .report-header {
+                background: #1a1a2e !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .section {
+                break-inside: avoid;
+            }
+
+            .metric-card {
+                break-inside: avoid;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            body {
+                padding: 0.5rem;
+            }
+
+            .report-header,
+            .section {
+                padding-left: 1.2rem;
+                padding-right: 1.2rem;
+            }
+
+            .report-header h1 {
+                font-size: 1.4rem;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-meta {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- ===== 报告头部 ===== -->
+        <div class="report-header">
+            <h1>{{COMPANY_NAME_CN}} ({{COMPANY_NAME_EN}})</h1>
+            <div class="subtitle">{{PERIOD}} 季度财报解读</div>
+            <div class="header-meta">
+                <span>📌 {{TICKER}} · {{EXCHANGE}}</span>
+                <span>📅 财报日期: {{REPORT_DATE}}</span>
+                <span>💰 收盘价: {{STOCK_PRICE}}</span>
+            </div>
+        </div>
+
+        <!-- ===== 1. 公司概览 ===== -->
+        <div class="section">
+            <h2>📋 公司概览</h2>
+            <p><!-- Brief company description and what this quarter covers --></p>
+        </div>
+
+        <!-- ===== 2. 核心指标 ===== -->
+        <div class="section">
+            <h2>📊 核心指标</h2>
+            <div class="metrics-grid">
+                <!-- Example: Revenue card (beat) -->
+                <div class="metric-card beat">
+                    <div class="metric-label">营收 (Revenue)</div>
+                    <div class="metric-value">$XX.X B</div>
+                    <div class="metric-detail">预期: $XX.X B · 同比: <span class="positive">+XX%</span></div>
+                    <div class="metric-badge beat">✅ 超预期</div>
+                </div>
+
+                <!-- Example: EPS card (beat) -->
+                <div class="metric-card beat">
+                    <div class="metric-label">每股收益 (EPS)</div>
+                    <div class="metric-value">$X.XX</div>
+                    <div class="metric-detail">预期: $X.XX · 同比: <span class="positive">+XX%</span></div>
+                    <div class="metric-badge beat">✅ 超预期</div>
+                </div>
+
+                <!-- Example: Net Income card (neutral) -->
+                <div class="metric-card neutral">
+                    <div class="metric-label">净利润 (Net Income)</div>
+                    <div class="metric-value">$XX.X B</div>
+                    <div class="metric-detail">同比: <span class="positive">+XX%</span></div>
+                </div>
+
+                <!-- Example: Gross Margin card (miss) -->
+                <div class="metric-card miss">
+                    <div class="metric-label">毛利率 (Gross Margin)</div>
+                    <div class="metric-value">XX.X%</div>
+                    <div class="metric-detail">预期: XX.X% · 同比: <span class="negative">-X.Xpp</span></div>
+                    <div class="metric-badge miss">⚠️ 不及预期</div>
+                </div>
+
+                <!-- Example: Operating Margin -->
+                <div class="metric-card beat">
+                    <div class="metric-label">营业利润率 (Op. Margin)</div>
+                    <div class="metric-value">XX.X%</div>
+                    <div class="metric-detail">预期: XX.X% · 同比: <span class="positive">+X.Xpp</span></div>
+                    <div class="metric-badge beat">✅ 超预期</div>
+                </div>
+
+                <!-- Example: Free Cash Flow -->
+                <div class="metric-card neutral">
+                    <div class="metric-label">自由现金流 (FCF)</div>
+                    <div class="metric-value">$XX.X B</div>
+                    <div class="metric-detail">同比: <span class="positive">+XX%</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== 3. 收入分析 ===== -->
+        <div class="section">
+            <h2>💹 收入分析</h2>
+
+            <!-- Segment breakdown -->
+            <h3 style="font-size: 1rem; color: #4a5568; margin-bottom: 0.8rem;">按业务板块</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>业务板块</th>
+                        <th>营收</th>
+                        <th>同比变化</th>
+                        <th>占比</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>板块 A</td>
+                        <td>$XX.X B</td>
+                        <td class="positive">+XX%</td>
+                        <td>XX%</td>
+                    </tr>
+                    <tr>
+                        <td>板块 B</td>
+                        <td>$XX.X B</td>
+                        <td class="negative">-XX%</td>
+                        <td>XX%</td>
+                    </tr>
+                    <!-- More rows as needed -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ===== 4. 业绩亮点与不足 ===== -->
+        <div class="section">
+            <h2>🎯 业绩亮点与不足</h2>
+            <ul class="highlights-list">
+                <li>✅ <strong>亮点:</strong> Description of a beat or positive surprise</li>
+                <li>✅ <strong>亮点:</strong> Another positive highlight</li>
+                <li>⚠️ <strong>不足:</strong> Description of a miss or concern</li>
+                <li>📊 <strong>关注:</strong> Neutral but noteworthy data point</li>
+            </ul>
+        </div>
+
+        <!-- ===== 5. 前瞻指引 ===== -->
+        <div class="section">
+            <h2>🔮 前瞻指引</h2>
+            <div class="guidance-row">
+                <span class="guidance-label">下季度营收指引</span>
+                <span class="guidance-value">$XX.X - $XX.X B</span>
+            </div>
+            <div class="guidance-row">
+                <span class="guidance-label">市场一致预期</span>
+                <span class="guidance-value">$XX.X B</span>
+            </div>
+            <div class="guidance-row">
+                <span class="guidance-label">全年营收指引</span>
+                <span class="guidance-value">$XXX - $XXX B</span>
+            </div>
+            <p style="margin-top: 1rem; font-size: 0.9rem; color: #4a5568;">
+                <!-- Management commentary on guidance -->
+            </p>
+        </div>
+
+        <!-- ===== 6. 风险提示 ===== -->
+        <div class="section">
+            <h2>⚠️ 风险提示</h2>
+            <div class="risk-item">
+                <strong>风险一:</strong> Description of key risk
+            </div>
+            <div class="risk-item">
+                <strong>风险二:</strong> Description of another risk
+            </div>
+        </div>
+
+        <!-- ===== 7. 投资者总结 ===== -->
+        <div class="section">
+            <h2>💡 投资者总结 — "So What?"</h2>
+            <!-- Assessment badge: positive / neutral / negative -->
+            <div class="assessment positive">🟢 整体评价: 积极</div>
+            <!-- Or: <div class="assessment neutral">🟡 整体评价: 中性</div> -->
+            <!-- Or: <div class="assessment negative">🔴 整体评价: 消极</div> -->
+            <div class="summary-text">
+                <p><!-- Paragraph 1: Quick summary of the quarter --></p>
+                <p><!-- Paragraph 2: What matters most for investors --></p>
+                <p><!-- Paragraph 3: Forward-looking perspective --></p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="report-footer">
+            由 Earnings-Decoded 自动生成 · 数据来源于公开财报及新闻 · 仅供参考，不构成投资建议
+        </div>
+    </div>
+</body>
+</html>

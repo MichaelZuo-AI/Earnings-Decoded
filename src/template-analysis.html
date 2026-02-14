@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{COMPANY_NAME}} — 企业经营分析</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: #f8f9fa;
+            color: #1a1a2e;
+            line-height: 1.7;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+        }
+
+        /* Header — Purple gradient for analysis reports */
+        .report-header {
+            background: linear-gradient(135deg, #2d1b69 0%, #1a1a2e 50%, #16213e 100%);
+            color: #fff;
+            padding: 2.5rem 2.5rem 2rem;
+        }
+
+        .report-header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+
+        .report-header .subtitle {
+            font-size: 1rem;
+            color: #c4b5fd;
+            margin-bottom: 1rem;
+        }
+
+        .header-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            font-size: 0.85rem;
+            color: #cbd5e0;
+        }
+
+        .header-meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        /* Section */
+        .section {
+            padding: 2rem 2.5rem;
+            border-bottom: 1px solid #edf2f7;
+        }
+
+        .section:last-child {
+            border-bottom: none;
+        }
+
+        .section h2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 1.2rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .section h3 {
+            font-size: 1rem;
+            color: #4a5568;
+            margin-bottom: 0.8rem;
+            margin-top: 1.5rem;
+        }
+
+        .section h3:first-of-type {
+            margin-top: 0;
+        }
+
+        /* Perspective Section — Top border accent by perspective */
+        .perspective-section {
+            border-top: 4px solid #e2e8f0;
+        }
+
+        .perspective-section.observer {
+            border-top-color: #6b46c1;
+        }
+
+        .perspective-section.strategist {
+            border-top-color: #2b6cb0;
+        }
+
+        .perspective-section.ceo {
+            border-top-color: #c05621;
+        }
+
+        .perspective-section.investment {
+            border-top-color: #276749;
+        }
+
+        /* Metric Cards Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .metric-card {
+            background: #fafbfc;
+            border-radius: 8px;
+            padding: 1.2rem 1rem 1.2rem 1.2rem;
+            border-left: 4px solid #cbd5e0;
+            transition: box-shadow 0.2s;
+        }
+
+        .metric-card:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .metric-card.beat, .metric-card.strong {
+            border-left-color: #38a169;
+        }
+
+        .metric-card.miss, .metric-card.weak {
+            border-left-color: #e53e3e;
+        }
+
+        .metric-card.neutral {
+            border-left-color: #a0aec0;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            color: #718096;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.3rem;
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+
+        .metric-detail {
+            font-size: 0.82rem;
+            color: #718096;
+            margin-top: 0.3rem;
+        }
+
+        .metric-detail .positive {
+            color: #38a169;
+            font-weight: 600;
+        }
+
+        .metric-detail .negative {
+            color: #e53e3e;
+            font-weight: 600;
+        }
+
+        .metric-badge {
+            display: inline-block;
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            margin-top: 0.4rem;
+        }
+
+        .metric-badge.beat, .metric-badge.strong {
+            background: #f0fff4;
+            color: #276749;
+        }
+
+        .metric-badge.miss, .metric-badge.weak {
+            background: #fff5f5;
+            color: #9b2c2c;
+        }
+
+        /* Valuation Cards */
+        .valuation-card {
+            background: #fafbfc;
+            border-radius: 8px;
+            padding: 1.2rem;
+            border-left: 4px solid #cbd5e0;
+            transition: box-shadow 0.2s;
+        }
+
+        .valuation-card:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .valuation-card.undervalued {
+            border-left-color: #276749;
+            background: #f0fff4;
+        }
+
+        .valuation-card.fair {
+            border-left-color: #d69e2e;
+            background: #fffff0;
+        }
+
+        .valuation-card.overvalued {
+            border-left-color: #e53e3e;
+            background: #fff5f5;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        thead th {
+            background: #f7fafc;
+            color: #4a5568;
+            font-weight: 600;
+            text-align: left;
+            padding: 0.75rem 1rem;
+            border-bottom: 2px solid #e2e8f0;
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        tbody td {
+            padding: 0.7rem 1rem;
+            border-bottom: 1px solid #edf2f7;
+            color: #2d3748;
+        }
+
+        tbody tr:nth-child(even) {
+            background: #fafbfc;
+        }
+
+        tbody tr:hover {
+            background: #f0f4f8;
+        }
+
+        td.positive {
+            color: #38a169;
+            font-weight: 600;
+        }
+
+        td.negative {
+            color: #e53e3e;
+            font-weight: 600;
+        }
+
+        /* Highlights List */
+        .highlights-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .highlights-list li {
+            padding: 0.7rem 0;
+            border-bottom: 1px solid #f0f4f8;
+            font-size: 0.92rem;
+            line-height: 1.6;
+        }
+
+        .highlights-list li:last-child {
+            border-bottom: none;
+        }
+
+        /* Two-column layout for strengths/weaknesses */
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .two-column .column-header {
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-bottom: 0.6rem;
+            padding-bottom: 0.4rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .two-column .strengths .column-header {
+            color: #276749;
+            border-bottom-color: #c6f6d5;
+        }
+
+        .two-column .weaknesses .column-header {
+            color: #9b2c2c;
+            border-bottom-color: #fed7d7;
+        }
+
+        .two-column ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .two-column ul li {
+            padding: 0.4rem 0;
+            font-size: 0.88rem;
+            line-height: 1.5;
+            border-bottom: 1px solid #f7fafc;
+        }
+
+        .two-column ul li:last-child {
+            border-bottom: none;
+        }
+
+        /* Moat rating */
+        .moat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 0.8rem;
+            margin-top: 0.5rem;
+        }
+
+        .moat-item {
+            background: #fafbfc;
+            border-radius: 8px;
+            padding: 0.8rem 1rem;
+            border-left: 3px solid #cbd5e0;
+        }
+
+        .moat-item.strong {
+            border-left-color: #38a169;
+        }
+
+        .moat-item.medium {
+            border-left-color: #d69e2e;
+        }
+
+        .moat-item.weak {
+            border-left-color: #e53e3e;
+        }
+
+        .moat-item .moat-name {
+            font-weight: 700;
+            font-size: 0.88rem;
+            color: #2d3748;
+        }
+
+        .moat-item .moat-rating {
+            font-size: 0.8rem;
+            color: #718096;
+            margin-top: 0.2rem;
+        }
+
+        .moat-item .moat-desc {
+            font-size: 0.82rem;
+            color: #4a5568;
+            margin-top: 0.3rem;
+            line-height: 1.5;
+        }
+
+        /* Priority Cards — CEO section */
+        .priority-cards {
+            display: grid;
+            gap: 0.8rem;
+            margin-top: 0.5rem;
+        }
+
+        .priority-card {
+            background: #fafbfc;
+            border-radius: 8px;
+            padding: 1rem 1.2rem;
+            border-left: 4px solid #cbd5e0;
+        }
+
+        .priority-card.urgent {
+            border-left-color: #e53e3e;
+            background: #fff5f5;
+        }
+
+        .priority-card.important {
+            border-left-color: #d69e2e;
+            background: #fffff0;
+        }
+
+        .priority-card.strategic {
+            border-left-color: #2b6cb0;
+            background: #ebf8ff;
+        }
+
+        .priority-card .priority-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.3rem;
+        }
+
+        .priority-card.urgent .priority-label {
+            color: #9b2c2c;
+        }
+
+        .priority-card.important .priority-label {
+            color: #975a16;
+        }
+
+        .priority-card.strategic .priority-label {
+            color: #2b6cb0;
+        }
+
+        .priority-card .priority-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #1a1a2e;
+            margin-bottom: 0.3rem;
+        }
+
+        .priority-card .priority-desc {
+            font-size: 0.85rem;
+            color: #4a5568;
+            line-height: 1.5;
+        }
+
+        /* Timeline — 3-year plan */
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+            margin-top: 0.5rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0.5rem;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #e2e8f0;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-bottom: 1.5rem;
+        }
+
+        .timeline-item:last-child {
+            padding-bottom: 0;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -1.55rem;
+            top: 0.4rem;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #fff;
+            border: 3px solid #6b46c1;
+        }
+
+        .timeline-item.year1::before {
+            border-color: #c05621;
+        }
+
+        .timeline-item.year2::before {
+            border-color: #d69e2e;
+        }
+
+        .timeline-item.year3::before {
+            border-color: #2b6cb0;
+        }
+
+        .timeline-item .timeline-label {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #2d3748;
+            margin-bottom: 0.3rem;
+        }
+
+        .timeline-item .timeline-content {
+            font-size: 0.88rem;
+            color: #4a5568;
+            line-height: 1.6;
+        }
+
+        .timeline-item .timeline-content ul {
+            list-style: disc;
+            padding-left: 1.2rem;
+            margin-top: 0.3rem;
+        }
+
+        .timeline-item .timeline-content li {
+            padding: 0.2rem 0;
+        }
+
+        /* Synthesis Dashboard — 2x2 grid */
+        .synthesis-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .synthesis-card {
+            border-radius: 8px;
+            padding: 1.2rem;
+            border-top: 4px solid #e2e8f0;
+        }
+
+        .synthesis-card.observer {
+            border-top-color: #6b46c1;
+            background: #faf5ff;
+        }
+
+        .synthesis-card.strategist {
+            border-top-color: #2b6cb0;
+            background: #ebf8ff;
+        }
+
+        .synthesis-card.ceo {
+            border-top-color: #c05621;
+            background: #fffaf0;
+        }
+
+        .synthesis-card.investment {
+            border-top-color: #276749;
+            background: #f0fff4;
+        }
+
+        .synthesis-card .synthesis-label {
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.4rem;
+        }
+
+        .synthesis-card.observer .synthesis-label {
+            color: #6b46c1;
+        }
+
+        .synthesis-card.strategist .synthesis-label {
+            color: #2b6cb0;
+        }
+
+        .synthesis-card.ceo .synthesis-label {
+            color: #c05621;
+        }
+
+        .synthesis-card.investment .synthesis-label {
+            color: #276749;
+        }
+
+        .synthesis-card .synthesis-verdict {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 0.3rem;
+        }
+
+        .synthesis-card .synthesis-rationale {
+            font-size: 0.82rem;
+            color: #4a5568;
+            line-height: 1.5;
+        }
+
+        /* Info Block — blue/purple accent for trends/news */
+        .info-block {
+            background: #ebf8ff;
+            border-left: 3px solid #4299e1;
+            padding: 0.8rem 1rem;
+            margin-bottom: 0.6rem;
+            border-radius: 0 6px 6px 0;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .info-block.purple {
+            background: #faf5ff;
+            border-left-color: #6b46c1;
+        }
+
+        .info-block strong {
+            color: #2d3748;
+        }
+
+        /* Risk items */
+        .risk-item {
+            background: #fffaf0;
+            border-left: 3px solid #ed8936;
+            padding: 0.8rem 1rem;
+            margin-bottom: 0.6rem;
+            border-radius: 0 6px 6px 0;
+            font-size: 0.9rem;
+        }
+
+        /* Catalyst blocks */
+        .catalyst-item {
+            background: #f0fff4;
+            border-left: 3px solid #38a169;
+            padding: 0.8rem 1rem;
+            margin-bottom: 0.6rem;
+            border-radius: 0 6px 6px 0;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        /* Assessment Badge */
+        .assessment {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            padding: 0.5rem 1.2rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .assessment.positive {
+            background: #f0fff4;
+            color: #276749;
+        }
+
+        .assessment.neutral {
+            background: #fefcbf;
+            color: #975a16;
+        }
+
+        .assessment.negative {
+            background: #fff5f5;
+            color: #9b2c2c;
+        }
+
+        .summary-text {
+            font-size: 0.95rem;
+            line-height: 1.8;
+            color: #2d3748;
+        }
+
+        .summary-text p {
+            margin-bottom: 1rem;
+        }
+
+        /* Company Profile Table */
+        .profile-table {
+            width: auto;
+            min-width: 50%;
+        }
+
+        .profile-table td {
+            padding: 0.5rem 1rem;
+        }
+
+        .profile-table td:first-child {
+            font-weight: 600;
+            color: #4a5568;
+            white-space: nowrap;
+        }
+
+        /* Section divider text */
+        .perspective-intro {
+            font-size: 0.9rem;
+            color: #718096;
+            font-style: italic;
+            margin-bottom: 1rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+
+        /* Footer */
+        .report-footer {
+            text-align: center;
+            padding: 1.5rem 2.5rem;
+            font-size: 0.78rem;
+            color: #a0aec0;
+            border-top: 1px solid #edf2f7;
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                background: #fff;
+                padding: 0;
+            }
+
+            .container {
+                box-shadow: none;
+                border-radius: 0;
+            }
+
+            .report-header {
+                background: #2d1b69 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .section {
+                break-inside: avoid;
+            }
+
+            .metric-card, .priority-card, .synthesis-card, .valuation-card {
+                break-inside: avoid;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            body {
+                padding: 0.5rem;
+            }
+
+            .report-header,
+            .section {
+                padding-left: 1.2rem;
+                padding-right: 1.2rem;
+            }
+
+            .report-header h1 {
+                font-size: 1.4rem;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+
+            .synthesis-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .moat-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-meta {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- ===== 报告头部 ===== -->
+        <div class="report-header">
+            <h1>{{COMPANY_NAME_CN}} ({{COMPANY_NAME_EN}})</h1>
+            <div class="subtitle">企业经营分析 · 四维视角</div>
+            <div class="header-meta">
+                <span>📌 {{TICKER}} · {{EXCHANGE}}</span>
+                <span>💰 市值: {{MARKET_CAP}}</span>
+                <span>📅 分析日期: {{ANALYSIS_DATE}}</span>
+                <span>💹 当前股价: {{STOCK_PRICE}}</span>
+            </div>
+        </div>
+
+        <!-- ===== 1. 企业画像 ===== -->
+        <div class="section">
+            <h2>📋 企业画像</h2>
+            <p style="margin-bottom: 1rem;"><!-- One paragraph: what the company does in plain language --></p>
+            <table class="profile-table">
+                <tbody>
+                    <tr><td>成立年份</td><td>{{FOUNDED}}</td></tr>
+                    <tr><td>总部</td><td>{{HEADQUARTERS}}</td></tr>
+                    <tr><td>CEO</td><td>{{CEO_NAME}}</td></tr>
+                    <tr><td>员工人数</td><td>{{EMPLOYEES}}</td></tr>
+                    <tr><td>市值</td><td>{{MARKET_CAP}}</td></tr>
+                    <tr><td>主要业务</td><td>{{CORE_BUSINESS}}</td></tr>
+                    <tr><td>上市交易所</td><td>{{EXCHANGE}}</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ===== 2. 观察者：巴菲特式商业分析 ===== -->
+        <div class="section perspective-section observer">
+            <h2>🔍 观察者：这是一门好生意吗？</h2>
+            <p class="perspective-intro">像巴菲特一样审视这门生意的本质——护城河是否持久，管理层是否值得信赖，长期经济特征如何。</p>
+
+            <!-- 2a. 生意本质 -->
+            <h3>生意本质</h3>
+            <p style="font-size: 0.92rem; line-height: 1.7;">
+                <!-- 一句话说清楚靠什么赚钱，商业模式是否简单可理解 -->
+            </p>
+
+            <!-- 2b. 护城河分析 -->
+            <h3>护城河分析</h3>
+            <div class="moat-grid">
+                <!-- Example moat items — use .strong / .medium / .weak -->
+                <div class="moat-item strong">
+                    <div class="moat-name">🟢 品牌</div>
+                    <div class="moat-desc"><!-- Assessment --></div>
+                </div>
+                <div class="moat-item medium">
+                    <div class="moat-name">🟡 网络效应</div>
+                    <div class="moat-desc"><!-- Assessment --></div>
+                </div>
+                <div class="moat-item weak">
+                    <div class="moat-name">🔴 转换成本</div>
+                    <div class="moat-desc"><!-- Assessment --></div>
+                </div>
+                <div class="moat-item strong">
+                    <div class="moat-name">🟢 成本优势</div>
+                    <div class="moat-desc"><!-- Assessment --></div>
+                </div>
+                <div class="moat-item medium">
+                    <div class="moat-name">🟡 规模效应</div>
+                    <div class="moat-desc"><!-- Assessment --></div>
+                </div>
+            </div>
+
+            <!-- 2c. 财务体质 -->
+            <h3>财务体质</h3>
+            <div class="metrics-grid">
+                <div class="metric-card strong">
+                    <div class="metric-label">ROE（10年均值）</div>
+                    <div class="metric-value">XX%</div>
+                    <div class="metric-detail">巴菲特标准: >15%</div>
+                    <div class="metric-badge strong">✅ 优秀</div>
+                </div>
+                <div class="metric-card neutral">
+                    <div class="metric-label">ROIC</div>
+                    <div class="metric-value">XX%</div>
+                    <div class="metric-detail">投入资本回报效率</div>
+                </div>
+                <div class="metric-card strong">
+                    <div class="metric-label">自由现金流</div>
+                    <div class="metric-value">$XX.X B</div>
+                    <div class="metric-detail">同比: <span class="positive">+XX%</span></div>
+                </div>
+                <div class="metric-card neutral">
+                    <div class="metric-label">债务 / 股权比</div>
+                    <div class="metric-value">X.XX</div>
+                    <div class="metric-detail">低负债 = 财务安全</div>
+                </div>
+                <div class="metric-card neutral">
+                    <div class="metric-label">毛利率趋势</div>
+                    <div class="metric-value">XX.X%</div>
+                    <div class="metric-detail">5年趋势: <span class="positive">稳步上升</span></div>
+                </div>
+            </div>
+
+            <!-- 2d. 管理层评估 -->
+            <h3>管理层评估</h3>
+            <ul class="highlights-list">
+                <li><!-- 资本配置能力评估 --></li>
+                <li><!-- 管理层持股情况 --></li>
+                <li><!-- 诚信记录评估 --></li>
+            </ul>
+
+            <!-- 2e. 竞争格局 -->
+            <h3>竞争格局</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>指标</th>
+                        <th>{{COMPANY}}</th>
+                        <th>{{COMPETITOR_1}}</th>
+                        <th>{{COMPETITOR_2}}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>市场份额</td>
+                        <td>XX%</td>
+                        <td>XX%</td>
+                        <td>XX%</td>
+                    </tr>
+                    <tr>
+                        <td>毛利率</td>
+                        <td class="positive">XX%</td>
+                        <td>XX%</td>
+                        <td>XX%</td>
+                    </tr>
+                    <tr>
+                        <td>ROE</td>
+                        <td class="positive">XX%</td>
+                        <td>XX%</td>
+                        <td>XX%</td>
+                    </tr>
+                    <tr>
+                        <td>护城河评级</td>
+                        <td>🟢 宽</td>
+                        <td>🟡 中</td>
+                        <td>🔴 窄</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- 2f. 观察者小结 -->
+            <h3>观察者小结</h3>
+            <div class="assessment positive">🟢 好生意</div>
+            <!-- Or: .neutral with 🟡 一般 / .negative with 🔴 差生意 -->
+            <div class="summary-text">
+                <p><!-- 巴菲特会怎么评价这门生意？ --></p>
+            </div>
+        </div>
+
+        <!-- ===== 3. 战略家：发展方向 ===== -->
+        <div class="section perspective-section strategist">
+            <h2>🧭 战略家：发展方向</h2>
+            <p class="perspective-intro">从行业全局和竞争态势出发，分析公司的战略定位与未来走向。</p>
+
+            <!-- 3a. 行业趋势 -->
+            <h3>行业趋势</h3>
+            <div class="info-block">
+                <strong>趋势一:</strong> <!-- Description and company implications -->
+            </div>
+            <div class="info-block">
+                <strong>趋势二:</strong> <!-- Description and company implications -->
+            </div>
+            <div class="info-block">
+                <strong>趋势三:</strong> <!-- Description and company implications -->
+            </div>
+
+            <!-- 3b. 战略定位 -->
+            <h3>战略定位</h3>
+            <div class="two-column">
+                <div class="strengths">
+                    <div class="column-header">✅ 战略优势</div>
+                    <ul>
+                        <li><!-- Strength 1 --></li>
+                        <li><!-- Strength 2 --></li>
+                        <li><!-- Strength 3 --></li>
+                    </ul>
+                </div>
+                <div class="weaknesses">
+                    <div class="column-header">⚠️ 战略风险</div>
+                    <ul>
+                        <li><!-- Weakness 1 --></li>
+                        <li><!-- Weakness 2 --></li>
+                        <li><!-- Weakness 3 --></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 3c. 战略建议 -->
+            <h3>战略建议</h3>
+            <ul class="highlights-list">
+                <li><strong>建议一:</strong> <!-- Concrete recommendation --></li>
+                <li><strong>建议二:</strong> <!-- Concrete recommendation --></li>
+                <li><strong>建议三:</strong> <!-- Concrete recommendation --></li>
+            </ul>
+
+            <!-- 3d. 战略分析小结 -->
+            <h3>战略分析小结</h3>
+            <div class="summary-text">
+                <p><!-- Summary of strategic position --></p>
+            </div>
+        </div>
+
+        <!-- ===== 4. CEO视角：行动计划 ===== -->
+        <div class="section perspective-section ceo">
+            <h2>👔 CEO视角：行动计划</h2>
+            <p class="perspective-intro">如果我是CEO，面对当前局面，未来3-5年我会怎么做？</p>
+
+            <!-- 4a. 当务之急 -->
+            <h3>当务之急</h3>
+            <div class="priority-cards">
+                <div class="priority-card urgent">
+                    <div class="priority-label">🔴 紧急</div>
+                    <div class="priority-title"><!-- Priority title --></div>
+                    <div class="priority-desc"><!-- Why and what to do --></div>
+                </div>
+                <div class="priority-card important">
+                    <div class="priority-label">🟡 重要</div>
+                    <div class="priority-title"><!-- Priority title --></div>
+                    <div class="priority-desc"><!-- Why and what to do --></div>
+                </div>
+                <div class="priority-card strategic">
+                    <div class="priority-label">🔵 战略性</div>
+                    <div class="priority-title"><!-- Priority title --></div>
+                    <div class="priority-desc"><!-- Why and what to do --></div>
+                </div>
+            </div>
+
+            <!-- 4b. 三年行动计划 -->
+            <h3>三年行动计划</h3>
+            <div class="timeline">
+                <div class="timeline-item year1">
+                    <div class="timeline-label">第一年：夯实基础</div>
+                    <div class="timeline-content">
+                        <ul>
+                            <li><!-- Milestone 1 --></li>
+                            <li><!-- Milestone 2 --></li>
+                            <li><!-- Milestone 3 --></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="timeline-item year2">
+                    <div class="timeline-label">第二年：加速增长</div>
+                    <div class="timeline-content">
+                        <ul>
+                            <li><!-- Milestone 1 --></li>
+                            <li><!-- Milestone 2 --></li>
+                            <li><!-- Milestone 3 --></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="timeline-item year3">
+                    <div class="timeline-label">第三年：收获成果</div>
+                    <div class="timeline-content">
+                        <ul>
+                            <li><!-- Milestone 1 --></li>
+                            <li><!-- Milestone 2 --></li>
+                            <li><!-- Milestone 3 --></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4c. 五年愿景 -->
+            <h3>五年愿景</h3>
+            <div class="summary-text">
+                <p><!-- Long-term vision description --></p>
+            </div>
+
+            <!-- 4d. CEO小结 -->
+            <h3>CEO小结</h3>
+            <div class="summary-text">
+                <p><!-- Summary from CEO perspective --></p>
+            </div>
+        </div>
+
+        <!-- ===== 5. 投资顾问：巴菲特式投资评估 ===== -->
+        <div class="section perspective-section investment">
+            <h2>💰 投资顾问：巴菲特式投资评估</h2>
+            <p class="perspective-intro">不看股价波动，看企业内在价值。如果要买下整家公司，这个价格值不值？</p>
+
+            <!-- 5a. 内在价值 -->
+            <h3>内在价值</h3>
+            <div class="metrics-grid">
+                <div class="metric-card neutral">
+                    <div class="metric-label">所有者收益 (Owner Earnings)</div>
+                    <div class="metric-value">$XX.X B</div>
+                    <div class="metric-detail">净利润 + 折旧 - 维护性资本支出</div>
+                </div>
+                <div class="metric-card neutral">
+                    <div class="metric-label">FCF Yield</div>
+                    <div class="metric-value">X.X%</div>
+                    <div class="metric-detail">自由现金流 / 市值</div>
+                </div>
+                <div class="metric-card neutral">
+                    <div class="metric-label">安全边际</div>
+                    <div class="metric-value">~XX%</div>
+                    <div class="metric-detail">内在价值 vs 当前市价</div>
+                </div>
+            </div>
+
+            <!-- 5b. 估值锚点 -->
+            <h3>估值锚点</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>估值指标</th>
+                        <th>当前值</th>
+                        <th>历史均值</th>
+                        <th>行业均值</th>
+                        <th>评估</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>P/E</td>
+                        <td>XX.X</td>
+                        <td>XX.X</td>
+                        <td>XX.X</td>
+                        <td><!-- Assessment --></td>
+                    </tr>
+                    <tr>
+                        <td>P/FCF</td>
+                        <td>XX.X</td>
+                        <td>XX.X</td>
+                        <td>XX.X</td>
+                        <td><!-- Assessment --></td>
+                    </tr>
+                    <tr>
+                        <td>EV/EBITDA</td>
+                        <td>XX.X</td>
+                        <td>XX.X</td>
+                        <td>XX.X</td>
+                        <td><!-- Assessment --></td>
+                    </tr>
+                </tbody>
+            </table>
+            <p style="margin-top: 0.8rem; font-size: 0.85rem; color: #718096; font-style: italic;">
+                "宁可用合理价格买好公司，也不用便宜价格买平庸公司。" —— 沃伦·巴菲特
+            </p>
+
+            <!-- 5c. 十年展望 -->
+            <h3>十年展望</h3>
+            <div class="summary-text">
+                <p><!-- 盈利能否持续增长？复利逻辑是否成立？预估10年后合理市值范围 --></p>
+            </div>
+
+            <!-- 5d. 催化剂与风险 -->
+            <h3>催化剂与风险</h3>
+            <div class="catalyst-item">
+                <strong>🟢 催化剂:</strong> <!-- Positive catalyst from long-term holder perspective -->
+            </div>
+            <div class="catalyst-item">
+                <strong>🟢 催化剂:</strong> <!-- Another catalyst -->
+            </div>
+            <div class="risk-item">
+                <strong>🟠 风险:</strong> <!-- Risk from long-term holder perspective -->
+            </div>
+            <div class="risk-item">
+                <strong>🟠 风险:</strong> <!-- Another risk -->
+            </div>
+
+            <!-- 5e. 投资结论 -->
+            <h3>投资结论</h3>
+            <div class="assessment positive">🟢 值得拥有</div>
+            <!-- Or: .neutral with 🟡 观察等待 / .negative with 🔴 不符合标准 -->
+            <div class="summary-text">
+                <p><strong>巴菲特会买吗？</strong> <!-- One sentence judgment --></p>
+                <p><!-- Core reasoning --></p>
+            </div>
+        </div>
+
+        <!-- ===== 6. 四维总结 ===== -->
+        <div class="section">
+            <h2>📋 四维总结</h2>
+            <div class="synthesis-grid">
+                <div class="synthesis-card observer">
+                    <div class="synthesis-label">🔍 观察者</div>
+                    <div class="synthesis-verdict"><!-- 🟢/🟡/🔴 + verdict --></div>
+                    <div class="synthesis-rationale"><!-- One-sentence rationale --></div>
+                </div>
+                <div class="synthesis-card strategist">
+                    <div class="synthesis-label">🧭 战略家</div>
+                    <div class="synthesis-verdict"><!-- verdict --></div>
+                    <div class="synthesis-rationale"><!-- One-sentence rationale --></div>
+                </div>
+                <div class="synthesis-card ceo">
+                    <div class="synthesis-label">👔 CEO</div>
+                    <div class="synthesis-verdict"><!-- verdict --></div>
+                    <div class="synthesis-rationale"><!-- One-sentence rationale --></div>
+                </div>
+                <div class="synthesis-card investment">
+                    <div class="synthesis-label">💰 投资顾问</div>
+                    <div class="synthesis-verdict"><!-- verdict --></div>
+                    <div class="synthesis-rationale"><!-- One-sentence rationale --></div>
+                </div>
+            </div>
+            <div class="summary-text">
+                <p><!-- 1-2 paragraph synthesis weaving all four perspectives together --></p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="report-footer">
+            由 Earnings-Decoded 自动生成 · 数据来源于公开财报、新闻及分析师报告 · 仅供参考，不构成投资建议
+        </div>
+    </div>
+</body>
+</html>

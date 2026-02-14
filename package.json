@@ -1,0 +1,11 @@
+{
+  "name": "earnings-decoded",
+  "version": "1.0.0",
+  "description": "Translate corporate earnings financial reports into human-readable Chinese analysis via Claude Code",
+  "private": true,
+  "scripts": {
+    "open-latest": "open reports/$(ls -t reports/ | head -1)"
+  },
+  "keywords": ["earnings", "financial-analysis", "claude-code"],
+  "license": "MIT"
+}

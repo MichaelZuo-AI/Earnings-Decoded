@@ -1,0 +1,360 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Project Overview
+
+**Earnings-Decoded** is a company business analysis and earnings interpretation tool. It generates three types of reports in Chinese (Simplified): 财报解读 (earnings breakdown), 财报前瞻 (earnings preview), and 企业经营分析 (four-perspective business analysis). Part of the AIDreamWorks workspace.
+
+## Workspace Conventions
+
+- Financial reports and analysis are always in **Chinese (Simplified)**
+- User timezone: **KST (Asia/Seoul)**
+
+---
+
+## Workflow Router
+
+When the user provides input, determine which workflow to trigger:
+
+| User Input | Workflow | Report Type |
+|---|---|---|
+| `"分析 [company]"` / `"[company] 分析"` / `"analyze [company]"` | 企业经营分析 | Four-perspective business analysis |
+| `"前瞻 [company]"` / `"[company] 前瞻"` / `"[company] preview"` | 财报前瞻 | Pre-earnings preview |
+| Just a company name (no qualifier) | 财报解读 (default) | Earnings report breakdown |
+
+**Disambiguation**: If the user says just a company name with no other context, default to 财报解读. However, if the most recent earnings have already been covered OR the next earnings date is within ~3 weeks, **ask** whether they want 财报解读, 财报前瞻, or 企业经营分析.
+
+---
+
+## Workflow: Earnings Report Translation
+
+When the user provides a **company name** (e.g., "Apple", "CPNG", "Microsoft"), follow this workflow:
+
+### Step 1 — Search for Latest Earnings Data
+
+Use **WebSearch** to find the latest quarterly earnings. Run these searches in parallel:
+
+1. `"[Company] latest quarterly earnings results [current year]"` — for the earnings release
+2. `"[Company] earnings call highlights [current year]"` — for management commentary and guidance
+3. `"[Company] revenue segments breakdown [quarter] [year]"` — for segment data
+
+If the company has a well-known ticker (e.g., AAPL, CPNG, MSFT), use the ticker in searches for better results.
+
+### Step 2 — Fetch Detailed Data
+
+Use **WebFetch** on the most relevant results (earnings press releases, financial news articles, analyst summaries) to extract:
+
+- **Revenue**: total, by segment, by geography (actual vs. estimate)
+- **EPS**: GAAP and non-GAAP (actual vs. estimate)
+- **Net income / Operating income**
+- **Margins**: gross, operating, net (and YoY/QoQ changes)
+- **Key operating metrics**: users, subscribers, units shipped, etc.
+- **Forward guidance**: next quarter and full year outlook
+- **Management commentary**: key quotes on strategy, risks, opportunities
+- **Analyst consensus**: how results compared to Wall Street expectations
+
+### Step 3 — Translate & Analyze
+
+Transform the raw data into plain-language Chinese analysis. Follow these translation guidelines:
+
+#### Financial Jargon Translation Table
+
+| English Term | Chinese Translation | Plain Explanation |
+|---|---|---|
+| Revenue / Net Sales | 营收 / 净销售额 | 公司赚了多少钱（卖货/服务收入） |
+| EPS (Earnings Per Share) | 每股收益 | 每持有一股能分到多少利润 |
+| Gross Margin | 毛利率 | 扣掉成本后还剩多少利润（百分比） |
+| Operating Margin | 营业利润率 | 扣掉运营费用后的利润占比 |
+| Net Income | 净利润 | 最终到手的利润 |
+| YoY (Year-over-Year) | 同比 | 和去年同期比 |
+| QoQ (Quarter-over-Quarter) | 环比 | 和上个季度比 |
+| Beat / Miss | 超预期 / 不及预期 | 比华尔街预期好/差 |
+| Guidance | 业绩指引 | 公司对下个季度/全年的业绩预测 |
+| Free Cash Flow | 自由现金流 | 公司运营后真正可自由支配的现金 |
+| EBITDA | 息税折旧摊销前利润 | 衡量经营效率的利润指标 |
+| Capex | 资本支出 | 公司花在设备、建设等长期资产上的钱 |
+| Share Buyback | 股票回购 | 公司用利润买回自家股票 |
+| Consensus Estimate | 市场一致预期 | 分析师们的平均预测值 |
+| Segment | 业务板块 | 公司不同的业务分支 |
+| Headwind / Tailwind | 逆风 / 顺风 | 不利因素 / 有利因素 |
+| Macro | 宏观环境 | 整体经济大环境 |
+
+#### Writing Style
+
+- **Tone**: 像给一个聪明但非金融专业的朋友解释（smart friend, not a financial professional）
+- **Numbers**: Always include both absolute values and percentage changes
+- **Comparisons**: Always show actual vs. estimate where available
+- **Context**: Explain *why* a metric matters, not just *what* it is
+- **Verdict**: Each section should end with a brief assessment (positive/neutral/negative)
+- Use ✅ for beats/positives, ⚠️ for misses/concerns, 📊 for neutral data points
+
+### Step 4 — Generate HTML Report
+
+Read the template from `src/template.html` and use it as a reference for styling and structure. Generate a complete, self-contained HTML file with these sections:
+
+1. **公司概览** — Company name (Chinese + English), ticker, exchange, report period, report date, stock price at close. For companies with non-calendar fiscal years (e.g., Alibaba ends March), display the period as "YYYY年M月季度（FY20XX QX）" to prioritize readability — e.g., "2025年9月季度（FY2026 Q2）" instead of "FY2026 Q2（2025年7-9月）"
+2. **核心指标** — Metric cards showing: Revenue, EPS, Net Income, Gross Margin, Operating Margin, Free Cash Flow. Each card shows actual value, estimate, beat/miss status, and YoY change
+3. **收入分析** — Revenue breakdown by segment and/or geography in table format with YoY changes
+4. **业绩亮点与不足** — Bullet points of key beats (✅) and misses (⚠️) with plain-language explanation
+5. **前瞻指引** — Management's guidance for next quarter and full year, compared to consensus
+6. **风险提示** — Key risks mentioned in the call or identified from data
+7. **投资者总结 ("So What?")** — 2-3 paragraph plain-language summary of what this earnings report means. Include an overall assessment badge: 🟢 积极 / 🟡 中性 / 🔴 消极
+
+### Step 5 — Save & Open
+
+1. Write the HTML file to: `reports/[TICKER]-[YYYY]-[Quarter].html`
+   - Example: `reports/AAPL-2025-Q1.html`
+   - If ticker is unknown, use the company name: `reports/Coupang-2025-Q1.html`
+2. Open in Chrome: `open reports/[filename].html`
+
+---
+
+## Workflow: 财报前瞻 (Earnings Preview)
+
+When the user triggers an earnings preview, follow this workflow to generate a forward-looking pre-earnings report.
+
+### Trigger
+
+- User says **"前瞻 [company]"** or **"[company] 前瞻"** or **"[company] preview"**
+- If the user says just a company name with no other context, and the most recent earnings have already been covered OR the next earnings date is within ~3 weeks, **ask** whether they want 财报解读 (post-earnings) or 财报前瞻 (pre-earnings preview)
+
+### Step 1 — Search for Upcoming Earnings & Estimates
+
+Use **WebSearch** to gather pre-earnings data. Run these searches in parallel:
+
+1. `"[Company] upcoming earnings date [year]"` — confirm earnings date and time
+2. `"[Company] earnings preview estimates [quarter] [year]"` — consensus estimates
+3. `"[Company] analyst expectations [quarter] [year]"` — what analysts are watching
+
+If the company has a well-known ticker (e.g., AAPL, CPNG, MSFT), use the ticker in searches for better results.
+
+### Step 2 — Fetch Detailed Data
+
+Use **WebFetch** on the most relevant results (analyst previews, financial news, estimate compilations) to extract:
+
+- **Upcoming earnings date & time** (and whether it's before/after market)
+- **Consensus estimates**: Revenue, EPS (and range of high/low estimates)
+- **Previous quarter recap**: actual vs. estimate results, key takeaways
+- **Historical beat/miss track record** (last 4-8 quarters)
+- **Key metrics to watch** this quarter (specific to the company/industry)
+- **Recent news/events** that may impact results (product launches, macro shifts, regulatory changes)
+- **Analyst sentiment**: recent upgrades/downgrades, price target changes
+
+### Step 3 — Translate & Analyze
+
+Use the same **Financial Jargon Translation Table** and **Writing Style** guidelines from the Earnings Report Translation workflow above.
+
+Additional preview-specific guidelines:
+- Use 🔍 for key things to watch
+- Use 📈 for positive expectations, 📉 for negative expectations
+- Use 🏆 for historical beats, ❌ for historical misses in the track record table
+- **Tone**: Forward-looking and analytical — "市场预期..." / "分析师关注..." / "值得留意的是..."
+- **No verdicts on actual performance** — this is a preview, not a post-mortem
+
+### Step 4 — Generate HTML Preview Report
+
+Read the template from `src/template.html` and use it as a reference for styling and structure. Generate a complete, self-contained HTML file with the following **preview-specific** modifications and sections:
+
+#### Styling Differences from Earnings Report
+
+- **Header gradient**: Use a blue-tinted gradient (`linear-gradient(135deg, #1a365d 0%, #2a4a7f 100%)`) instead of the dark default, to visually distinguish previews
+- **Header subtitle**: Says "财报前瞻" instead of "财报解读"
+- **Metric cards**: Use a blue left border (`border-left-color: #4299e1`) with a "preview" style class for consensus estimates, since there are no beat/miss results yet. Add CSS: `.metric-card.preview { border-left-color: #4299e1; }` and `.metric-badge.preview { background: #ebf8ff; color: #2b6cb0; }`
+
+#### Report Sections
+
+1. **公司概览** — Company name (Chinese + English), ticker, exchange, upcoming earnings date & time (标注盘前/盘后), current stock price. Use the same fiscal year display conventions as the earnings report.
+2. **市场预期** — Metric cards showing consensus estimates for: Revenue, EPS, and other key metrics. Each card shows the consensus estimate, the range of estimates (high/low), and YoY change vs. last year's same quarter. Use the `preview` card style (blue border) with badge text "📊 市场预期".
+3. **上季回顾** — Quick recap of last quarter's results. Show key metrics (Revenue, EPS) with actual vs. estimate and beat/miss status. 2-3 bullet points on key takeaways from last quarter.
+4. **本季看点** — Bullet list (using `highlights-list` style) of 4-6 key things to watch this quarter. Each item should explain *why* it matters. Use 🔍 prefix.
+5. **历史表现** — Table showing beat/miss track record for the last 4-8 quarters. Columns: 季度, 营收(实际), 营收(预期), EPS(实际), EPS(预期), 结果. Use 🏆/❌ in the 结果 column.
+6. **近期动态** — Recent news, analyst actions, and events affecting outlook. Use `risk-item` style blocks (but with blue/info color: `border-left-color: #4299e1; background: #ebf8ff;`). 3-5 items.
+7. **投资者关注点** — 2-3 paragraph plain-language summary of what matters most going into this earnings report. No overall assessment badge (since results haven't been released), but highlight the key question investors should focus on.
+
+### Step 5 — Save & Open
+
+1. Write the HTML file to: `reports/[TICKER]-[YYYY]-[Quarter]-preview.html`
+   - Example: `reports/AAPL-2025-Q2-preview.html`
+   - If ticker is unknown, use the company name: `reports/Coupang-2025-Q2-preview.html`
+2. Open in Chrome: `open reports/[filename].html`
+
+---
+
+## Workflow: 企业经营分析 (Company Business Analysis)
+
+When the user triggers a business analysis (via "分析", "analyze", etc.), follow this workflow to generate a comprehensive four-perspective analysis report.
+
+### Trigger
+
+- User says **"分析 [company]"** or **"[company] 分析"** or **"analyze [company]"**
+
+### Step 1 — Search (Parallel WebSearches)
+
+#### Phase 1 — Baseline (6 parallel searches)
+
+Use **WebSearch** to gather comprehensive data. Run all 6 searches in parallel:
+
+1. `"[Company] latest quarterly earnings results [year]"` — financial performance
+2. `"[Company] business model revenue segments [year]"` — how it makes money
+3. `"[Company] competitive advantage moat analysis [year]"` — 护城河（Buffett lens）
+4. `"[Company] ROE ROIC free cash flow 10 year history"` — 长期财务体质（Buffett lens）
+5. `"[Company] strategy CEO capital allocation [year]"` — management + direction
+6. `"[Company] intrinsic value valuation analyst price target [year]"` — 估值与安全边际
+
+If the company has a well-known ticker (e.g., AAPL, CPNG, BABA), use the ticker in searches for better results.
+
+#### Phase 2 — Targeted Deep Dives (after Phase 1 fetch)
+
+Based on Phase 1 results, run additional searches as needed to fill gaps:
+
+- **Observer (巴菲特商业分析维度)**: moat/competitive advantage type, ROE/ROIC history, management capital allocation track record, pricing power evidence, debt vs equity structure
+- **Strategist**: industry trends, strategic initiatives, partnerships/acquisitions
+- **CEO**: CEO interviews, organizational challenges, R&D pipeline
+- **Investment (巴菲特投资维度)**: owner earnings/FCF yield, intrinsic value estimates, margin of safety, insider ownership, buyback history, book value growth
+
+### Step 2 — Fetch & Extract
+
+Use **WebFetch** on the most relevant results from Phase 1 and Phase 2 to extract detailed data for each perspective:
+
+- **Company basics**: founding year, HQ, CEO, employee count, market cap, core business
+- **Financial metrics**: ROE (10-year), ROIC, FCF, debt/equity ratio, gross margin trends, owner earnings
+- **Moat assessment**: brand strength, network effects, switching costs, cost advantages, economies of scale
+- **Management**: capital allocation track record (buybacks, dividends, reinvestment returns), insider ownership, integrity
+- **Competitive landscape**: market share vs competitors, moat comparison
+- **Strategic position**: industry trends, current bets, risks and opportunities
+- **Valuation**: P/E, P/FCF, EV/EBITDA (current vs historical vs industry), intrinsic value estimates, analyst price targets
+
+### Step 3 — Analyze & Write
+
+Transform raw data into the four-perspective analysis. Each perspective has a distinct voice and analytical lens:
+
+#### Perspective Voices
+
+- **🔍 Observer (巴菲特式商业分析)**:
+  - Core question chain: 这门生意我能看懂吗？→ 它有持久的护城河吗？→ 管理层是否诚实能干？→ 长期经济特征如何？
+  - Tone: 沉稳、穿透表象
+  - Voice: "这门生意的本质是..." / "护城河的耐久性在于..." / "管理层用股东的钱是否明智..."
+
+- **🧭 Strategist (战略家)**:
+  - Framework-driven, industry-focused
+  - Voice: "核心战略问题是..." / "从行业趋势来看..." / "竞争格局正在..."
+
+- **👔 CEO (CEO视角)**:
+  - Action-oriented, priority-driven
+  - Voice: "上任第一件事..." / "12个月内必须..." / "三年后这家公司应该..."
+
+- **💰 Investment Advisor (巴菲特式投资评估)**:
+  - Value-focused, long-term holder perspective (not trader perspective)
+  - Voice: "如果我要买下整家公司..." / "以所有者收益来衡量..." / "安全边际是否足够..." / "十年后这家公司会在哪里..."
+
+Use the **Financial Jargon Translation Table** and **Strategic Jargon Translation Table** below for consistent terminology. Follow the same **Writing Style** guidelines as the earnings workflow.
+
+### Step 4 — Generate HTML Analysis Report
+
+Read the template from `src/template-analysis.html` and use it as a reference for styling and structure. Generate a complete, self-contained HTML file with these sections:
+
+1. **企业画像** — Company name (Chinese + English), ticker, exchange, key facts table (Founded, HQ, CEO, Market Cap, etc.), one-paragraph plain-language description of what the company does
+2. **🔍 观察者：这是一门好生意吗？** — Buffett-style business analysis:
+   - 2a. 生意本质 — 一句话说清楚靠什么赚钱，商业模式是否简单可理解
+   - 2b. 护城河分析 — 逐一评估五种护城河（品牌、网络效应、转换成本、成本优势、规模效应），用 🟢强/🟡中/🔴弱 标注
+   - 2c. 财务体质 — Metric cards: ROE (10年)、ROIC、自由现金流、债务/股权比、毛利率趋势
+   - 2d. 管理层评估 — 资本配置能力、管理层持股、诚信记录
+   - 2e. 竞争格局 — Comparison table vs 2-3 competitors on moat metrics
+   - 2f. 观察者小结 — Assessment badge: 🟢 好生意 / 🟡 一般 / 🔴 差生意
+3. **🧭 战略家：发展方向** — Strategic analysis:
+   - 3a. 行业趋势 — 3-5 key trends with company implications (use info-block style)
+   - 3b. 战略定位 — Two-column layout: 战略优势 vs 战略风险
+   - 3c. 战略建议 — 3-5 concrete recommendations
+   - 3d. 战略分析小结
+4. **👔 CEO视角：行动计划** — Action plan:
+   - 4a. 当务之急 — Top 3 priorities as priority cards (urgent/important/strategic)
+   - 4b. 三年行动计划 — Year 1/2/3 milestones using timeline layout
+   - 4c. 五年愿景 — Long-term vision
+   - 4d. CEO小结
+5. **💰 投资顾问：巴菲特式投资评估** — Investment assessment:
+   - 5a. 内在价值 — Owner Earnings, FCF Yield, Margin of Safety metric cards
+   - 5b. 估值锚点 — P/E, P/FCF, EV/EBITDA table (current vs historical vs industry)
+   - 5c. 十年展望 — Compounding logic, projected market cap range
+   - 5d. 催化剂与风险 — Green catalyst blocks + orange risk blocks (long-term holder perspective)
+   - 5e. 投资结论 — 🟢 值得拥有 / 🟡 观察等待 / 🔴 不符合标准 + "巴菲特会买吗？" one-sentence judgment
+6. **📋 四维总结** — Synthesis dashboard:
+   - 2x2 grid: each cell = perspective name + verdict + 1-sentence rationale
+   - 1-2 paragraph synthesis weaving all four perspectives together
+7. **Footer**
+
+### Step 5 — Save & Open
+
+1. Write the HTML file to: `reports/[TICKER]-analysis-[YYYY]-[MM].html`
+   - Example: `reports/BABA-analysis-2026-02.html`
+   - If ticker is unknown, use the company name: `reports/Coupang-analysis-2026-02.html`
+   - Uses year-month (not quarter) since this analysis is not tied to a specific earnings period
+2. Open in Chrome: `open reports/[filename].html`
+
+---
+
+#### Strategic Jargon Translation Table
+
+This table extends the Financial Jargon Translation Table above with terms specific to business analysis:
+
+| English Term | Chinese Translation | Plain Explanation |
+|---|---|---|
+| **巴菲特核心概念** | | |
+| Moat | 护城河 | 别人很难复制的核心能力（巴菲特最看重的东西） |
+| Margin of Safety | 安全边际 | 用打折价买入，留足犯错空间 |
+| Owner Earnings | 所有者收益 | 股东真正能拿到手的钱（比净利润更真实） |
+| Intrinsic Value | 内在价值 | 一家公司真正值多少钱（不是股价） |
+| Circle of Competence | 能力圈 | 只投自己看得懂的生意 |
+| Mr. Market | 市场先生 | 市场短期是投票机，长期是称重机 |
+| Pricing Power | 定价权 | 涨价客户也不走——最好的护城河指标 |
+| Capital Allocation | 资本配置 | 管理层怎么花股东的钱（最考验CEO能力） |
+| Float | 浮存金 | 先收钱后付钱的商业模式（如保险） |
+| Compounding | 复利 | 利滚利，时间越长效果越惊人 |
+| **战略分析概念** | | |
+| TAM | 总可寻址市场 | 市场天花板有多高 |
+| ROIC | 投入资本回报率 | 每投一块钱能赚回多少 |
+| ROE | 净资产收益率 | 股东每一块钱赚了多少（巴菲特要求>15%） |
+| Market Share | 市场份额 | 在整个市场里占多大一块饼 |
+| Network Effect | 网络效应 | 用的人越多，产品越好用 |
+| Switching Cost | 转换成本 | 用户换到竞品有多麻烦 |
+| Flywheel Effect | 飞轮效应 | 一个好的循环越转越快 |
+| Recurring Revenue | 经常性收入 | 每月/每年都会来的稳定收入 |
+| LTV / CAC | 用户终身价值 / 获客成本 | 一个用户值多少钱 vs 获得他花多少钱 |
+| Vertical Integration | 垂直整合 | 上下游自己干，不靠外人 |
+
+---
+
+## Report Styling Reference
+
+Templates are in `src/`. Key styling rules shared across all templates:
+
+- Self-contained: all CSS inline, no external dependencies
+- Light background (#f8f9fa), max-width 900px, centered
+- System font stack for clean reading
+- Tables: alternating row colors, clean borders
+- Print-friendly: `@media print` styles included
+- Responsive: works on desktop and mobile
+
+| Template | File | Header | Accent |
+|---|---|---|---|
+| 财报解读 | `src/template.html` | Dark gradient (`#1a1a2e → #16213e`) | Green/red metric borders |
+| 财报前瞻 | `src/template.html` (modified) | Blue gradient (`#1a365d → #2a4a7f`) | Blue metric borders |
+| 企业经营分析 | `src/template-analysis.html` | Purple gradient (`#2d1b69 → #1a1a2e → #16213e`) | Perspective accent colors |
+
+Analysis template perspective accent colors:
+- Observer: `#6b46c1` (purple)
+- Strategist: `#2b6cb0` (blue)
+- CEO: `#c05621` (amber)
+- Investment: `#276749` (green)
+
+---
+
+## Important Notes
+
+- **Language**: All report content MUST be in Chinese (Simplified). Only keep English for company names, tickers, and financial acronyms.
+- **Data accuracy**: Always cite the source period and date. If data is uncertain, say so — never fabricate numbers.
+- **Freshness**: Search for the most recent quarter's earnings. If the user specifies a quarter, search for that specific one.
+- **Multiple sources**: Cross-reference at least 2 sources for key numbers (revenue, EPS).
+- If the user says just a company name with no other context, treat it as a request to generate an earnings report. However, if the most recent earnings have already been covered or the next earnings date is within ~3 weeks, ask whether they want 财报解读, 财报前瞻, or 企业经营分析.
+- If the user says "前瞻 [company]", "[company] 前瞻", or "[company] preview", treat it as a request to generate an earnings preview report.
+- If the user says "分析 [company]", "[company] 分析", or "analyze [company]", treat it as a request to generate a four-perspective business analysis report.
