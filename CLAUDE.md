@@ -225,6 +225,8 @@ Use **WebFetch** on the most relevant results from Phase 1 and Phase 2 to extrac
 - **Strategic position**: industry trends, current bets, risks and opportunities
 - **Valuation**: P/E, P/FCF, EV/EBITDA (current vs historical vs industry), intrinsic value estimates, analyst price targets
 
+**Live Data Verification**: Before proceeding, run a final search to verify the current stock price, market cap, and global market cap ranking. Do NOT rely on article data for these — they go stale within days. Any superlative claims ("全球第一", "最大") must be confirmed against current data.
+
 ### Step 3 — Analyze & Write
 
 Transform raw data into the four-perspective analysis. Each perspective has a distinct voice and analytical lens:
@@ -355,6 +357,11 @@ Analysis template perspective accent colors:
 - **Data accuracy**: Always cite the source period and date. If data is uncertain, say so — never fabricate numbers.
 - **Freshness**: Search for the most recent quarter's earnings. If the user specifies a quarter, search for that specific one.
 - **Multiple sources**: Cross-reference at least 2 sources for key numbers (revenue, EPS).
+- **Live data verification (CRITICAL)**: Before writing the final report, always run a dedicated search to verify real-time data points that change daily. Never rely on stale article data for these. Specifically:
+  1. **Stock price**: Search `"[TICKER] stock price today"` to get the current price
+  2. **Market cap**: Verify current market cap AND global/sector ranking (e.g., don't claim "全球第一" without checking)
+  3. **Key claims**: Any superlative claim ("最大", "第一", "最高") must be verified against current data, not assumed from old articles
+  4. If a fetched source shows data from more than 7 days ago, flag it and search for a fresher source
 - If the user says just a company name with no other context, treat it as a request to generate an earnings report. However, if the most recent earnings have already been covered or the next earnings date is within ~3 weeks, ask whether they want 财报解读, 财报前瞻, or 企业经营分析.
 - If the user says "前瞻 [company]", "[company] 前瞻", or "[company] preview", treat it as a request to generate an earnings preview report.
 - If the user says "分析 [company]", "[company] 分析", or "analyze [company]", treat it as a request to generate a four-perspective business analysis report.
